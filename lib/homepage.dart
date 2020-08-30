@@ -14,8 +14,9 @@ class _HomePageState extends State<HomePage> {
     var formattedTime = DateFormat('HH:mm').format(now);
     var formattedDate = DateFormat('EEEE, d MMMM y').format(now);
     var timezoneString = now.timeZoneOffset.toString().split('.').first;
+    timezoneString = timezoneString.substring(0, timezoneString.length - 3);
     var offsetSign = '';
-    if (timezoneString.startsWith('-')) offsetSign = '+';
+    if (!timezoneString.startsWith('-')) offsetSign = '+';
     print(timezoneString);
 
     return Scaffold(
@@ -25,22 +26,14 @@ class _HomePageState extends State<HomePage> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              FlatButton(
-                onPressed: () {},
-                child: Column(
-                  children: <Widget>[
-                    FlutterLogo(),
-                    Text(
-                      'Clock',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                    )
-                  ],
-                ),
-              ),
+              buildFlatButton('Clock', 'assets/clock_icon.png'),
+              buildFlatButton('Alarm', 'assets/alarm_icon.png'),
+              buildFlatButton('Timer', 'assets/timer_icon.png'),
+              buildFlatButton('Stopwatch', 'assets/stopwatch_icon.png'),
             ],
           ),
           VerticalDivider(
-            color: Colors.white54,
+            color: Colors.white,
             width: 1,
           ),
           Expanded(
@@ -49,40 +42,110 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(
-                    'Clock',
-                    style: TextStyle(color: Colors.white, fontSize: 24),
-                  ),
-                  SizedBox(height: 32),
-                  Text(
-                    formattedTime,
-                    style: TextStyle(color: Colors.white, fontSize: 64),
-                  ),
-                  Text(
-                    formattedDate,
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  ClockView(),
-                  Text(
-                    'Timezone',
-                    style: TextStyle(color: Colors.white, fontSize: 24),
-                  ),
-                  SizedBox(height: 16),
-                  Row(children: <Widget>[
-                    Icon(
-                      Icons.language,
-                      color: Colors.white,
+                  Flexible(
+                    flex: 1,
+                    fit: FlexFit.tight,
+                    child: Text(
+                      'Clock',
+                      style: TextStyle(
+                          fontFamily: 'ProductSans',
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          fontSize: 24),
                     ),
-                    SizedBox(width: 16),
-                    Text(
-                      'UTC' + offsetSign + timezoneString,
-                      style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                  Flexible(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          formattedTime,
+                          style: TextStyle(
+                              fontFamily: 'ProductSans',
+                              color: Colors.white,
+                              fontSize: 64),
+                        ),
+                        Text(
+                          formattedDate,
+                          style: TextStyle(
+                              fontFamily: 'ProductSans',
+                              fontWeight: FontWeight.w300,
+                              color: Colors.white,
+                              fontSize: 20),
+                        ),
+                      ],
                     ),
-                  ])
+                  ),
+                  Flexible(
+                    flex: 4,
+                    fit: FlexFit.tight,
+                    child: Align(
+                        alignment: Alignment.center,
+                        child: ClockView(
+                          size: MediaQuery.of(context).size.height / 3,
+                        )),
+                  ),
+                  Flexible(
+                    flex: 2,
+                    fit: FlexFit.tight,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'Timezone',
+                          style: TextStyle(
+                              fontFamily: 'ProductSans',
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                              fontSize: 24),
+                        ),
+                        SizedBox(height: 16),
+                        Row(
+                          children: <Widget>[
+                            Icon(
+                              Icons.language,
+                              color: Colors.white,
+                            ),
+                            SizedBox(width: 16),
+                            Text(
+                              'UTC' + offsetSign + timezoneString,
+                              style: TextStyle(
+                                  fontFamily: 'ProductSans',
+                                  color: Colors.white,
+                                  fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildFlatButton(String title, String image) {
+    return FlatButton(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      color: title == 'Clcok' ? Colors.red : Colors.transparent,
+      onPressed: () {},
+      child: Column(
+        children: <Widget>[
+          Image.asset(
+            image,
+            scale: 1.5,
+          ),
+          SizedBox(height: 16),
+          Text(
+            title ?? '',
+            style: TextStyle(
+                fontFamily: 'ProductSans', color: Colors.white, fontSize: 14),
+          )
         ],
       ),
     );
