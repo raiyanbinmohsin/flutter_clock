@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_clock/clock_view.dart';
+import 'package:flutter_clock/data.dart';
+import 'package:flutter_clock/enums.dart';
+import 'package:flutter_clock/menu_info.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -25,103 +29,106 @@ class _HomePageState extends State<HomePage> {
         children: <Widget>[
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              buildFlatButton('Clock', 'assets/clock_icon.png'),
-              buildFlatButton('Alarm', 'assets/alarm_icon.png'),
-              buildFlatButton('Timer', 'assets/timer_icon.png'),
-              buildFlatButton('Stopwatch', 'assets/stopwatch_icon.png'),
-            ],
+            children: menuItems
+                .map((currentMenuInfo) => buildMenuButton(currentMenuInfo))
+                .toList(),
           ),
           VerticalDivider(
             color: Colors.white,
             width: 1,
           ),
           Expanded(
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 32, vertical: 64),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Flexible(
-                    flex: 1,
-                    fit: FlexFit.tight,
-                    child: Text(
-                      'Clock',
-                      style: TextStyle(
-                          fontFamily: 'ProductSans',
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontSize: 24),
-                    ),
-                  ),
-                  Flexible(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          formattedTime,
+            child: Consumer<MenuInfo>(
+              builder: (BuildContext context, MenuInfo value, Widget child) {
+                if (value.menuType != MenuType.clock) return Container();
+
+                return Container(
+                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 64),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Flexible(
+                        flex: 1,
+                        fit: FlexFit.tight,
+                        child: Text(
+                          'Clock',
                           style: TextStyle(
                               fontFamily: 'ProductSans',
-                              color: Colors.white,
-                              fontSize: 64),
-                        ),
-                        Text(
-                          formattedDate,
-                          style: TextStyle(
-                              fontFamily: 'ProductSans',
-                              fontWeight: FontWeight.w300,
-                              color: Colors.white,
-                              fontSize: 20),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Flexible(
-                    flex: 4,
-                    fit: FlexFit.tight,
-                    child: Align(
-                        alignment: Alignment.center,
-                        child: ClockView(
-                          size: MediaQuery.of(context).size.height / 3,
-                        )),
-                  ),
-                  Flexible(
-                    flex: 2,
-                    fit: FlexFit.tight,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'Timezone',
-                          style: TextStyle(
-                              fontFamily: 'ProductSans',
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w700,
                               color: Colors.white,
                               fontSize: 24),
                         ),
-                        SizedBox(height: 16),
-                        Row(
+                      ),
+                      Flexible(
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Icon(
-                              Icons.language,
-                              color: Colors.white,
-                            ),
-                            SizedBox(width: 16),
                             Text(
-                              'UTC' + offsetSign + timezoneString,
+                              formattedTime,
                               style: TextStyle(
                                   fontFamily: 'ProductSans',
                                   color: Colors.white,
-                                  fontSize: 14),
+                                  fontSize: 64),
+                            ),
+                            Text(
+                              formattedDate,
+                              style: TextStyle(
+                                  fontFamily: 'ProductSans',
+                                  fontWeight: FontWeight.w300,
+                                  color: Colors.white,
+                                  fontSize: 20),
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                      Flexible(
+                        flex: 4,
+                        fit: FlexFit.tight,
+                        child: Align(
+                            alignment: Alignment.center,
+                            child: ClockView(
+                              size: MediaQuery.of(context).size.height / 3,
+                            )),
+                      ),
+                      Flexible(
+                        flex: 2,
+                        fit: FlexFit.tight,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              'Timezone',
+                              style: TextStyle(
+                                  fontFamily: 'ProductSans',
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                  fontSize: 24),
+                            ),
+                            SizedBox(height: 16),
+                            Row(
+                              children: <Widget>[
+                                Icon(
+                                  Icons.language,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(width: 16),
+                                Text(
+                                  'UTC ' + offsetSign + timezoneString,
+                                  style: TextStyle(
+                                      fontFamily: 'ProductSans',
+                                      color: Colors.white,
+                                      fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
@@ -129,25 +136,36 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildFlatButton(String title, String image) {
-    return FlatButton(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      color: title == 'Clcok' ? Colors.red : Colors.transparent,
-      onPressed: () {},
-      child: Column(
-        children: <Widget>[
-          Image.asset(
-            image,
-            scale: 1.5,
+  Widget buildMenuButton(MenuInfo currentMenuInfo) {
+    return Consumer<MenuInfo>(
+      builder: (BuildContext context, MenuInfo value, Widget child) {
+        return FlatButton(
+          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 0),
+          color: currentMenuInfo.menuType == value.menuType
+              ? Colors.grey
+              : Colors.transparent,
+          onPressed: () {
+            var menuInfo = Provider.of<MenuInfo>(context, listen: false);
+            menuInfo.updateMenu(currentMenuInfo);
+          },
+          child: Column(
+            children: <Widget>[
+              Image.asset(
+                currentMenuInfo.imageSource,
+                scale: 2.0,
+              ),
+              SizedBox(height: 16),
+              Text(
+                currentMenuInfo.title ?? '',
+                style: TextStyle(
+                    fontFamily: 'ProductSans',
+                    color: Colors.white,
+                    fontSize: 14),
+              ),
+            ],
           ),
-          SizedBox(height: 16),
-          Text(
-            title ?? '',
-            style: TextStyle(
-                fontFamily: 'ProductSans', color: Colors.white, fontSize: 14),
-          )
-        ],
-      ),
+        );
+      },
     );
   }
 }
