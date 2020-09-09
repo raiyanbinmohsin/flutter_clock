@@ -7,6 +7,7 @@ import 'package:flutter_clock/theme_data.dart';
 import 'package:flutter_clock/alarm_page.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_clock/clock_page.dart';
+import 'package:flutter_clock/timer.dart';
 
 class HomePage extends StatefulWidget {
   @override
